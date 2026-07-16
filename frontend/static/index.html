@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NAS Subtitle Studio</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="side-panel">
+        <header class="brand">
+          <div>
+            <h1>NAS Subtitle Studio</h1>
+            <p>錄影、上傳、字幕、章節、匯出</p>
+          </div>
+          <span id="geminiStatus" class="pill warn">Gemini 檢查中</span>
+        </header>
+
+        <section class="tool-section">
+          <h2>錄影</h2>
+          <div class="record-bar">
+            <button id="recordBtn" class="primary">開始錄影</button>
+            <span id="timer" class="timer">00:00.000</span>
+          </div>
+        </section>
+
+        <section class="tool-section">
+          <h2>上傳</h2>
+          <input id="fileInput" type="file" accept="video/mp4,video/webm,video/quicktime,video/x-matroska" />
+        </section>
+
+        <section class="tool-section">
+          <h2>Gemini API</h2>
+          <div class="settings-form">
+            <input id="geminiApiKey" type="password" placeholder="輸入 Gemini API Key" autocomplete="off" />
+            <button id="saveGeminiBtn">儲存</button>
+          </div>
+        </section>
+
+        <section class="library">
+          <div class="section-head">
+            <h2>影片庫</h2>
+            <button id="refreshBtn">更新</button>
+          </div>
+          <div id="videoList" class="video-list"></div>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <div id="message" class="message hidden"></div>
+        <div id="blankState" class="blank-state">請先錄影或上傳影片。</div>
+
+        <section id="viewerBand" class="viewer-band hidden">
+          <div class="viewer-main">
+            <video id="player" controls></video>
+          </div>
+          <div class="video-meta">
+            <h2 id="videoTitle"></h2>
+            <p id="videoFilename"></p>
+            <p>狀態：<strong id="videoStatus"></strong></p>
+            <p id="processingStatus" class="processing-status"></p>
+            <p id="videoDuration"></p>
+            <p id="videoError" class="error-text"></p>
+            <div class="action-grid">
+              <button id="captionBtn">產生字幕</button>
+              <button id="saveBtn">儲存字幕</button>
+              <button id="exportBtn">匯出含字幕 MP4</button>
+              <button id="deleteVideoBtn" class="danger">刪除影片</button>
+            </div>
+            <div class="download-grid">
+              <a id="downloadVideo" href="#">原始/標準影片</a>
+              <a id="downloadSrt" href="#">SRT</a>
+              <a id="downloadVtt" href="#">VTT</a>
+              <a id="downloadTxt" href="#">逐字稿</a>
+              <a id="downloadChapters" href="#">章節 MD</a>
+              <a id="downloadExport" href="#">含字幕 MP4</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="editorLayout" class="editor-layout hidden">
+          <div class="subtitle-editor">
+            <div class="section-head">
+              <h2>字幕編輯</h2>
+              <button id="addSubtitleBtn">新增字幕</button>
+            </div>
+            <div id="subtitleList" class="subtitle-list"></div>
+          </div>
+
+          <div class="side-editor">
+            <div class="section-head">
+              <h2>章節</h2>
+              <button id="addChapterBtn">新增章節</button>
+            </div>
+            <div id="chapterList" class="chapter-list"></div>
+
+            <h2>逐字稿</h2>
+            <textarea id="transcript" class="transcript"></textarea>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>

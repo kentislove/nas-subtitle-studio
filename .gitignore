@@ -1,0 +1,45 @@
+# Secrets and runtime settings
+.env
+.env.*
+!.env.example
+data/
+*.log
+*.tmp
+*.uploading
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Node / frontend build output
+node_modules/
+dist/
+build/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Windows shortcuts and local launchers
+*.lnk
+
+# Media outputs
+*.mp4
+*.webm
+*.mov
+*.mkv
+*.avi
+*.srt
+*.vtt
+
+# GitHub CLI / local auth dumps
+gh_token*
+github_token*
+*_token.txt

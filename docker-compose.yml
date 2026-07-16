@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: nas-subtitle-studio-backend
+    env_file:
+      - .env
+    volumes:
+      - ./data:/data
+    networks:
+      - subtitle-studio-net
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: nas-subtitle-studio-frontend
+    depends_on:
+      - backend
+    ports:
+      - "54320:80"
+    networks:
+      - subtitle-studio-net
+    restart: unless-stopped
+
+networks:
+  subtitle-studio-net:
+    name: subtitle-studio-net
+
