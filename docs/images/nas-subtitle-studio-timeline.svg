@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="760" viewBox="0 0 1440 760" role="img" aria-labelledby="title desc">
+  <title id="title">Subtitle timeline editing in NAS Subtitle Studio</title>
+  <desc id="desc">A focused view of the waveform timeline, draggable subtitle clips, and editable subtitle rows.</desc>
+  <rect width="1440" height="760" fill="#f5f7f8"/>
+  <rect x="36" y="32" width="1368" height="696" rx="10" fill="#fff" stroke="#d9e2e7"/>
+  <text x="70" y="82" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="30" font-weight="700">CapCut 式字幕時間軸</text>
+  <text x="70" y="116" fill="#65747e" font-family="Segoe UI, Noto Sans TC, Arial" font-size="18">對照人聲波形，直接拖曳字幕片段，或拉左右邊界調整每一句話的時間長度。</text>
+
+  <rect x="70" y="150" width="1300" height="360" rx="8" fill="#f7fbfc" stroke="#d9e2e7"/>
+  <rect x="70" y="150" width="1300" height="34" fill="#eef3f5"/>
+  <g font-family="Segoe UI, Noto Sans TC, Arial" font-size="13" fill="#65747e">
+    <text x="96" y="173">00:00</text><text x="286" y="173">00:15</text><text x="476" y="173">00:30</text>
+    <text x="666" y="173">00:45</text><text x="856" y="173">01:00</text><text x="1046" y="173">01:15</text><text x="1236" y="173">01:30</text>
+  </g>
+  <g stroke="#c9d6dc">
+    <line x1="90" y1="150" x2="90" y2="510"/><line x1="280" y1="150" x2="280" y2="510"/><line x1="470" y1="150" x2="470" y2="510"/>
+    <line x1="660" y1="150" x2="660" y2="510"/><line x1="850" y1="150" x2="850" y2="510"/><line x1="1040" y1="150" x2="1040" y2="510"/><line x1="1230" y1="150" x2="1230" y2="510"/>
+  </g>
+  <rect x="70" y="184" width="1300" height="100" fill="#fbfdfd" stroke="#d9e2e7"/>
+  <path d="M92 238 C120 182 132 295 162 230 S206 238 230 214 S270 297 300 224 S352 204 390 238 S444 186 482 244 S526 278 560 220 S604 205 644 238 S704 178 742 252 S812 204 850 230 S930 282 976 220 S1040 192 1096 238 S1168 292 1230 218 S1302 204 1348 238" fill="none" stroke="#4f8f87" stroke-width="8" stroke-linecap="round"/>
+
+  <g font-family="Segoe UI, Noto Sans TC, Arial" font-size="15">
+    <rect x="86" y="320" width="44" height="44" fill="#f7fbfc" stroke="#d9e2e7"/><text x="106" y="348" text-anchor="middle" fill="#65747e">1</text>
+    <rect x="160" y="326" width="310" height="32" rx="6" fill="#1e7f74" stroke="#17685f"/>
+    <rect x="160" y="326" width="10" height="32" fill="#8fc8bf"/><rect x="460" y="326" width="10" height="32" fill="#8fc8bf"/>
+    <text x="184" y="348" fill="#fff">根本沒鎖好，越往上看空隙越大。</text>
+
+    <rect x="86" y="374" width="44" height="44" fill="#f7fbfc" stroke="#d9e2e7"/><text x="106" y="402" text-anchor="middle" fill="#65747e">2</text>
+    <rect x="510" y="380" width="270" height="32" rx="6" fill="#1e7f74" stroke="#17685f"/>
+    <rect x="510" y="380" width="10" height="32" fill="#8fc8bf"/><rect x="770" y="380" width="10" height="32" fill="#8fc8bf"/>
+    <text x="534" y="402" fill="#fff">消費者怒控組裝家具出包。</text>
+
+    <rect x="86" y="428" width="44" height="44" fill="#f7fbfc" stroke="#d9e2e7"/><text x="106" y="456" text-anchor="middle" fill="#65747e">3</text>
+    <rect x="820" y="434" width="410" height="32" rx="6" fill="#1e7f74" stroke="#17685f"/>
+    <rect x="820" y="434" width="10" height="32" fill="#8fc8bf"/><rect x="1220" y="434" width="10" height="32" fill="#8fc8bf"/>
+    <text x="844" y="456" fill="#fff">依照停頓、語氣、段落切字幕，不再固定 5 秒。</text>
+  </g>
+  <line x1="790" y1="150" x2="790" y2="510" stroke="#b42318" stroke-width="4"/>
+  <rect x="812" y="196" width="122" height="34" rx="17" fill="#b42318"/>
+  <text x="873" y="219" text-anchor="middle" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="15" font-weight="700">播放位置</text>
+
+  <rect x="70" y="548" width="1300" height="128" rx="8" fill="#eef3f5"/>
+  <g font-family="Segoe UI, Noto Sans TC, Arial">
+    <rect x="92" y="570" width="70" height="40" rx="6" fill="#fff" stroke="#d9e2e7"/><text x="127" y="595" text-anchor="middle" fill="#1f2933" font-size="15" font-weight="700">播放</text>
+    <rect x="176" y="570" width="112" height="40" rx="6" fill="#fff" stroke="#d9e2e7"/><text x="232" y="595" text-anchor="middle" fill="#1f2933" font-size="15">00:01.000</text>
+    <rect x="302" y="570" width="112" height="40" rx="6" fill="#fff" stroke="#d9e2e7"/><text x="358" y="595" text-anchor="middle" fill="#1f2933" font-size="15">00:03.500</text>
+    <rect x="428" y="570" width="766" height="74" rx="6" fill="#fff" stroke="#d9e2e7"/>
+    <text x="450" y="602" fill="#1f2933" font-size="16">字幕文字可以直接編輯；上方預覽字幕會跟著更新。</text>
+    <rect x="1210" y="570" width="90" height="40" rx="6" fill="#fff" stroke="#d9e2e7"/><text x="1255" y="595" text-anchor="middle" fill="#b42318" font-size="15" font-weight="700">刪除</text>
+  </g>
+</svg>

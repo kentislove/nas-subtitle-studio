@@ -1,27 +1,79 @@
 # NAS Subtitle Studio
 
-NAS Subtitle Studio 是一套可自架在 NAS 上的影片錄製、上傳、AI 字幕辨識、字幕編輯與含字幕 MP4 匯出工具。  
-它的定位不是多軌剪輯軟體，而是「錄製教學影片 → 產生字幕 → 修字幕 → 匯出可交付影片」的單一工作流。
+NAS Subtitle Studio 是一套部署在 NAS 上的影片字幕工作台，目標是把「錄影、上傳、產字幕、匯入字幕、修時間軸、預覽字幕、匯出 MP4」收在同一個內網工具裡。
 
-## 功能
+它不是傳統剪輯軟體，而是為教學影片、系統操作錄影、內部教育訓練與字幕交付流程打造的專用工具。所有影片、字幕、匯出檔都保留在 NAS，資料庫只保存索引、字幕段落、章節與處理狀態。
+
+## 介面總覽
+
+![NAS Subtitle Studio overview](docs/images/nas-subtitle-studio-overview.svg)
+
+## 目前支援的工作流
+
+### 1. 在系統內產生字幕
+
+1. 直接用瀏覽器錄影，或上傳既有影片。
+2. 後端先把錄影轉成標準 MP4，取得正確 duration。
+3. 使用 Gemini API 產生逐字稿、字幕段落與章節。
+4. 依照說話停頓、語氣中斷與段落切字幕，不再用固定 3 到 5 秒硬切。
+5. 進入時間軸編輯器微調字幕。
+6. 預覽字幕後匯出含字幕 MP4。
+
+### 2. 匯入外部字幕
+
+如果你已經用 Gemini 對話視窗、其他字幕工具或人工整理出 SRT/VTT，可以直接匯入字幕，不必重新跑系統內的字幕產生流程。
+
+![SRT and VTT import workflow](docs/images/nas-subtitle-studio-import.svg)
+
+匯入後系統會：
+
+- 解析 SRT / VTT 時間軸
+- 保留每段字幕原本的開始與結束時間
+- 依影片長度做必要裁切
+- 寫入 MSSQL 與 NAS 字幕檔
+- 進入可編輯狀態
+- 支援上方播放器即時預覽字幕
+
+### 3. 拖曳式字幕時間軸
+
+![Subtitle timeline editing](docs/images/nas-subtitle-studio-timeline.svg)
+
+時間軸支援：
+
+- 人聲音訊波形
+- 播放位置紅線
+- 字幕片段拖曳移動
+- 左右邊界拉伸調整長度
+- 點擊時間軸跳到指定播放位置
+- 放大、縮小、Fit 時間軸
+- 上方播放器預覽目前字幕
+- 編輯文字後即時更新字幕預覽
+
+## 核心功能
 
 - 瀏覽器螢幕錄影與麥克風錄音
-- 上傳既有影片檔
+- 螢幕音訊與麥克風混音
+- 上傳 MP4 / WebM / MOV / MKV 等影片
+- WebM 錄影自動轉標準 MP4
+- 正確讀取影片 duration 後再產生字幕
 - Gemini API 產生逐字稿、字幕與章節
-- 字幕段落編輯、時間軸校正、章節編輯
-- 字幕排版整理：短句、兩行內、約 5 秒內切換
+- 匯入 SRT / VTT 外部字幕檔
+- 字幕時間軸拖曳、拉伸、預覽與儲存
+- 音訊波形產生與快取
+- SRT / VTT / TXT / 章節 Markdown 下載
 - FFmpeg 燒錄硬字幕並匯出 MP4
-- MSSQL 儲存影片索引、字幕段落、章節與處理狀態
-- NAS Docker Compose 部署
-- 內網 IP 使用，不強制依賴 Tailscale 或反向代理
+- MSSQL 儲存影片索引、字幕段落、章節與狀態
+- Docker Compose 部署在 NAS
+- 內網使用，不強制依賴 Tailscale 或反向代理
 
 ## 使用情境
 
 - 軟體操作教學影片
 - NAS / Docker / 系統維運教學
 - 內部教育訓練影片
-- 已錄製影片的字幕產生與整理
-- 需要保留影片檔與字幕檔的本地工作流程
+- 會議、課程、操作錄影的字幕整理
+- 已有 SRT/VTT 字幕的時間軸整合
+- 需要把影片與字幕留在 NAS 的本地工作流程
 
 ## 系統架構
 
@@ -31,8 +83,8 @@ flowchart LR
     Frontend --> API["FastAPI Backend"]
     API --> Files["NAS data 目錄<br/>videos / subtitles / exports"]
     API --> MSSQL["MSSQL<br/>影片索引 / 字幕 / 章節 / 狀態"]
-    API --> Gemini["Gemini API<br/>語音與影片字幕辨識"]
-    API --> FFmpeg["FFmpeg<br/>轉檔 / 燒錄字幕 / 匯出 MP4"]
+    API --> Gemini["Gemini API<br/>影片字幕辨識"]
+    API --> FFmpeg["FFmpeg / ffprobe<br/>轉檔 / 波形 / 燒錄字幕"]
 ```
 
 ## 資料流程
@@ -40,27 +92,32 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     participant B as Browser
-    participant N as Nginx
     participant A as FastAPI
     participant D as NAS data
     participant S as MSSQL
     participant G as Gemini
     participant F as FFmpeg
 
-    B->>N: 錄影或上傳影片
-    N->>A: /api/videos/upload
-    A->>D: 寫入影片檔
+    B->>A: 錄影或上傳影片
+    A->>D: 保存原始影片
+    A->>F: 轉成標準 MP4 並取得 duration
     A->>S: 建立影片紀錄
-    A-->>B: 回傳影片狀態
-    B->>A: 產生字幕
-    A->>G: 上傳影片並要求 JSON 字幕
-    G-->>A: transcript / subtitles / chapters
-    A->>A: 整理字幕斷句與排版
-    A->>S: 儲存字幕與章節
-    A->>D: 寫入 SRT / VTT / TXT
-    B->>A: 匯出含字幕 MP4
-    A->>F: 燒錄字幕與音訊轉 AAC
-    F-->>D: 產生 captioned MP4
+
+    alt 系統產生字幕
+        B->>A: 產生字幕
+        A->>G: 上傳 MP4 並要求逐字稿/字幕/章節
+        G-->>A: JSON 字幕結果
+    else 匯入外部字幕
+        B->>A: 上傳 SRT / VTT
+        A->>A: 解析字幕時間軸
+    end
+
+    A->>S: 儲存字幕段落與章節
+    A->>D: 寫入 SRT / VTT / TXT / chapters
+    B->>B: 拖曳時間軸與預覽字幕
+    B->>A: 匯出 MP4
+    A->>F: 燒錄字幕
+    F-->>D: captioned MP4
 ```
 
 ## 技術堆疊
@@ -86,8 +143,8 @@ NAS-Subtitle-Studio.nas/
 │  └─ app/
 │     ├─ main.py              # FastAPI routes
 │     ├─ gemini_service.py    # Gemini 字幕辨識
-│     ├─ subtitle_utils.py    # SRT/VTT 與字幕排版整理
-│     ├─ video_tools.py       # FFmpeg 轉檔與燒錄字幕
+│     ├─ subtitle_utils.py    # SRT/VTT 解析、輸出與時間軸整理
+│     ├─ video_tools.py       # FFmpeg 轉檔、波形、燒錄字幕
 │     ├─ storage.py           # MSSQL / SQLite 儲存層
 │     └─ runtime_settings.py  # Gemini API Key runtime 設定
 ├─ frontend/
@@ -99,10 +156,12 @@ NAS-Subtitle-Studio.nas/
 ├─ database/
 │  ├─ mssql_create_database.sql
 │  └─ mssql_schema.sql
+├─ docs/
+│  ├─ images/
+│  ├─ ARCHITECTURE.md
+│  ├─ DEVELOPMENT.md
+│  └─ GITHUB_RELEASE.md
 ├─ scripts/
-│  ├─ create_mssql_database.py
-│  ├─ create_mssql_database.ps1
-│  └─ check_mssql_connection.py
 ├─ docker-compose.yml
 ├─ nginx.conf
 ├─ .env.example
@@ -135,8 +194,7 @@ http://NAS_IP:54320
 
 ## Gemini API Key
 
-可在網頁左側「Gemini API」欄位輸入並儲存。  
-儲存後會寫入 NAS 掛載資料：
+可在網頁左側「Gemini API」欄位輸入並儲存。儲存後會寫入 NAS 掛載資料：
 
 ```text
 data/studio_settings.json
@@ -154,19 +212,9 @@ dbo.nas_subtitle_chapters
 
 影片本體不存進 MSSQL，避免資料庫被大型媒體檔塞滿；MSSQL 只保存索引、字幕、章節與狀態。影片與匯出檔保存在 NAS `data/`。
 
-## 字幕排版規則
-
-- 每段字幕盡量控制在 3-5 秒
-- 每段最多兩行
-- 每行約 18 個中文字
-- 長句依標點或長度切成下一段
-- 硬字幕使用 Noto Sans CJK 字型
-- 匯出 MP4 時音訊轉為 AAC，避免 webm/opus 來源掉音軌
-
 ## 瀏覽器錄影限制
 
-瀏覽器螢幕錄影 API 需要安全來源。  
-如果只用內網 HTTP，例如：
+瀏覽器螢幕錄影 API 需要安全來源。如果只用內網 HTTP，例如：
 
 ```text
 http://192.168.66.53:54320
@@ -190,4 +238,4 @@ open_chrome_recording_mode.cmd
 
 ## 授權
 
-目前未指定開源授權。若要公開到 GitHub，請先決定是否加入 MIT / Apache-2.0 / 私有授權。
+目前未指定開源授權。若要公開給外部使用者，請先決定是否加入 MIT / Apache-2.0 / 私有授權。

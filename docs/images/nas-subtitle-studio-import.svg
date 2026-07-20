@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="760" viewBox="0 0 1440 760" role="img" aria-labelledby="title desc">
+  <title id="title">SRT and VTT subtitle import workflow</title>
+  <desc id="desc">The import subtitle workflow: create SRT from Gemini, import it, align it on the timeline, preview, and export MP4.</desc>
+  <rect width="1440" height="760" fill="#f5f7f8"/>
+  <text x="60" y="72" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="34" font-weight="700">匯入字幕工作流</text>
+  <text x="60" y="110" fill="#65747e" font-family="Segoe UI, Noto Sans TC, Arial" font-size="19">保留 Gemini API 自動產字幕，也支援外部工具產生 SRT / VTT 後回到系統整合。</text>
+
+  <g font-family="Segoe UI, Noto Sans TC, Arial">
+    <rect x="60" y="160" width="294" height="150" rx="10" fill="#fff" stroke="#d9e2e7"/>
+    <text x="88" y="204" fill="#1f2933" font-size="23" font-weight="700">1. 上傳影片到 Gemini</text>
+    <text x="88" y="240" fill="#65747e" font-size="16">用 Gemini 對話視窗分析原始影片，</text>
+    <text x="88" y="264" fill="#65747e" font-size="16">要求輸出 SRT 字幕檔。</text>
+
+    <rect x="400" y="160" width="294" height="150" rx="10" fill="#fff" stroke="#d9e2e7"/>
+    <text x="428" y="204" fill="#1f2933" font-size="23" font-weight="700">2. 下載 SRT / VTT</text>
+    <text x="428" y="240" fill="#65747e" font-size="16">保留外部工具產出的時間軸，</text>
+    <text x="428" y="264" fill="#65747e" font-size="16">避免重跑系統字幕辨識。</text>
+
+    <rect x="740" y="160" width="294" height="150" rx="10" fill="#fff" stroke="#d9e2e7"/>
+    <text x="768" y="204" fill="#1f2933" font-size="23" font-weight="700">3. 匯入字幕</text>
+    <text x="768" y="240" fill="#65747e" font-size="16">按下「匯入字幕」，解析字幕檔，</text>
+    <text x="768" y="264" fill="#65747e" font-size="16">直接進入可編輯狀態。</text>
+
+    <rect x="1080" y="160" width="294" height="150" rx="10" fill="#fff" stroke="#d9e2e7"/>
+    <text x="1108" y="204" fill="#1f2933" font-size="23" font-weight="700">4. 預覽與匯出</text>
+    <text x="1108" y="240" fill="#65747e" font-size="16">對齊波形、拖曳修正，</text>
+    <text x="1108" y="264" fill="#65747e" font-size="16">確認後匯出含字幕 MP4。</text>
+
+    <path d="M354 235 H400" stroke="#1e7f74" stroke-width="4" marker-end="url(#arrow)"/>
+    <path d="M694 235 H740" stroke="#1e7f74" stroke-width="4" marker-end="url(#arrow)"/>
+    <path d="M1034 235 H1080" stroke="#1e7f74" stroke-width="4" marker-end="url(#arrow)"/>
+  </g>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L7,3 z" fill="#1e7f74"/>
+    </marker>
+  </defs>
+
+  <rect x="60" y="370" width="1320" height="318" rx="10" fill="#fff" stroke="#d9e2e7"/>
+  <rect x="94" y="404" width="420" height="250" rx="8" fill="#f7fbfc" stroke="#d9e2e7"/>
+  <text x="120" y="444" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="22" font-weight="700">操作區</text>
+  <rect x="120" y="472" width="350" height="42" rx="6" fill="#fff" stroke="#d9e2e7"/>
+  <text x="295" y="499" text-anchor="middle" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">產生字幕</text>
+  <rect x="120" y="526" width="350" height="42" rx="6" fill="#fff" stroke="#d9e2e7"/>
+  <text x="295" y="553" text-anchor="middle" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">匯入字幕</text>
+  <rect x="120" y="582" width="350" height="54" rx="8" fill="#fff8df" stroke="#e4c66a"/>
+  <text x="142" y="614" fill="#60420a" font-family="Segoe UI, Noto Sans TC, Arial" font-size="15">建議先用 Gemini 產生 SRT，再匯入整合。</text>
+
+  <rect x="548" y="404" width="380" height="250" rx="8" fill="#111820"/>
+  <rect x="574" y="430" width="328" height="184" rx="4" fill="#263139"/>
+  <rect x="594" y="552" width="288" height="36" rx="4" fill="#111820" opacity="0.85"/>
+  <text x="738" y="576" text-anchor="middle" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="19" font-weight="700">影片上方即時預覽字幕</text>
+  <rect x="744" y="622" width="158" height="30" rx="6" fill="#1e7f74"/>
+  <text x="823" y="643" text-anchor="middle" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="14" font-weight="700">顯示預覽字幕</text>
+
+  <rect x="962" y="404" width="380" height="250" rx="8" fill="#f7fbfc" stroke="#d9e2e7"/>
+  <text x="990" y="444" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="22" font-weight="700">保留時間軸</text>
+  <rect x="990" y="478" width="310" height="28" rx="6" fill="#1e7f74"/>
+  <rect x="1034" y="522" width="240" height="28" rx="6" fill="#1e7f74"/>
+  <rect x="1082" y="566" width="206" height="28" rx="6" fill="#1e7f74"/>
+  <line x1="1060" y1="456" x2="1060" y2="620" stroke="#b42318" stroke-width="3"/>
+  <text x="990" y="632" fill="#65747e" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16">匯入後可拖曳、裁切、儲存與匯出。</text>
+</svg>

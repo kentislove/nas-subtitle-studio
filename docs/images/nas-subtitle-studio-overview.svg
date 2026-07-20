@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="920" viewBox="0 0 1440 920" role="img" aria-labelledby="title desc">
+  <title id="title">NAS Subtitle Studio desktop overview</title>
+  <desc id="desc">The main NAS Subtitle Studio workspace with the video preview, subtitle controls, library, and editing panels.</desc>
+  <rect width="1440" height="920" fill="#f5f7f8"/>
+  <rect width="340" height="920" fill="#22313a"/>
+  <text x="28" y="52" fill="#f7fbfc" font-family="Segoe UI, Noto Sans TC, Arial" font-size="28" font-weight="700">NAS Subtitle Studio</text>
+  <text x="28" y="82" fill="#b9c7ce" font-family="Segoe UI, Noto Sans TC, Arial" font-size="17">錄影、上傳、字幕、章節、匯出</text>
+  <rect x="224" y="28" width="88" height="30" rx="15" fill="#2f6c5f" stroke="#5e8b84"/>
+  <text x="241" y="49" fill="#f7fbfc" font-family="Segoe UI, Noto Sans TC, Arial" font-size="14">Gemini 已設定</text>
+
+  <line x1="28" y1="118" x2="312" y2="118" stroke="#40515a"/>
+  <text x="28" y="154" fill="#f7fbfc" font-family="Segoe UI, Noto Sans TC, Arial" font-size="20" font-weight="700">錄影</text>
+  <rect x="28" y="174" width="116" height="40" rx="6" fill="#1e7f74"/>
+  <text x="52" y="200" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">開始錄影</text>
+  <text x="164" y="200" fill="#dbe7eb" font-family="Consolas, monospace" font-size="18">00:00.000</text>
+
+  <line x1="28" y1="244" x2="312" y2="244" stroke="#40515a"/>
+  <text x="28" y="280" fill="#f7fbfc" font-family="Segoe UI, Noto Sans TC, Arial" font-size="20" font-weight="700">上傳</text>
+  <rect x="28" y="302" width="284" height="40" rx="6" fill="#34464f" stroke="#52646d"/>
+  <text x="46" y="328" fill="#dbe7eb" font-family="Segoe UI, Noto Sans TC, Arial" font-size="15">選擇 MP4 / WebM / MOV 影片</text>
+
+  <line x1="28" y1="372" x2="312" y2="372" stroke="#40515a"/>
+  <text x="28" y="408" fill="#f7fbfc" font-family="Segoe UI, Noto Sans TC, Arial" font-size="20" font-weight="700">影片庫</text>
+  <rect x="252" y="386" width="60" height="34" rx="6" fill="#fff"/>
+  <text x="267" y="408" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="15" font-weight="700">更新</text>
+  <rect x="28" y="438" width="284" height="72" rx="7" fill="#2f6f62" stroke="#96b5af"/>
+  <text x="46" y="468" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">recording-2026-07-20...</text>
+  <rect x="46" y="480" width="58" height="22" rx="11" fill="#4c998c"/>
+  <text x="58" y="496" fill="#dbe7eb" font-family="Segoe UI, Noto Sans TC, Arial" font-size="12">可編輯</text>
+  <rect x="28" y="522" width="284" height="72" rx="7" fill="#2b3c45" stroke="#52646d"/>
+  <text x="46" y="552" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">uploaded-demo.mp4</text>
+  <rect x="46" y="564" width="58" height="22" rx="11" fill="#3d5660"/>
+  <text x="58" y="580" fill="#dbe7eb" font-family="Segoe UI, Noto Sans TC, Arial" font-size="12">已匯出</text>
+
+  <rect x="368" y="24" width="1044" height="68" rx="8" fill="#fff" stroke="#d9e2e7"/>
+  <text x="392" y="66" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="24" font-weight="700">本機 NAS 影片字幕工作台：錄影、字幕、修正、匯出都在同一個畫面完成</text>
+
+  <rect x="368" y="116" width="680" height="430" rx="8" fill="#111820"/>
+  <rect x="395" y="146" width="626" height="352" rx="4" fill="#263139"/>
+  <rect x="410" y="420" width="596" height="48" rx="4" fill="#111820" opacity="0.88"/>
+  <text x="476" y="452" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="26" font-weight="700">匯入字幕後可直接在影片上預覽字幕</text>
+  <rect x="368" y="546" width="680" height="56" rx="0" fill="#16212a"/>
+  <rect x="852" y="558" width="172" height="34" rx="6" fill="#1e7f74"/>
+  <text x="882" y="581" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">隱藏預覽字幕</text>
+
+  <rect x="1070" y="116" width="342" height="486" rx="8" fill="#fff" stroke="#d9e2e7"/>
+  <text x="1094" y="154" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="22" font-weight="700">recording-2026-07-20</text>
+  <text x="1094" y="188" fill="#65747e" font-family="Segoe UI, Noto Sans TC, Arial" font-size="15">狀態：可編輯</text>
+  <text x="1094" y="218" fill="#65747e" font-family="Segoe UI, Noto Sans TC, Arial" font-size="15">長度：01:21.384</text>
+  <rect x="1094" y="250" width="294" height="38" rx="6" fill="#fff" stroke="#d9e2e7"/>
+  <text x="1208" y="275" text-anchor="middle" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">產生字幕</text>
+  <rect x="1094" y="298" width="294" height="38" rx="6" fill="#fff" stroke="#d9e2e7"/>
+  <text x="1208" y="323" text-anchor="middle" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">匯入字幕</text>
+  <rect x="1094" y="346" width="294" height="126" rx="8" fill="#fff8df" stroke="#e4c66a"/>
+  <text x="1114" y="374" fill="#7a4f00" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">注意</text>
+  <text x="1114" y="404" fill="#60420a" font-family="Segoe UI, Noto Sans TC, Arial" font-size="14">建議先將影片上傳到 Gemini</text>
+  <text x="1114" y="426" fill="#60420a" font-family="Segoe UI, Noto Sans TC, Arial" font-size="14">產生 SRT 後，再回到這裡匯入</text>
+  <text x="1114" y="448" fill="#60420a" font-family="Segoe UI, Noto Sans TC, Arial" font-size="14">整合、預覽、拖曳修正。</text>
+  <rect x="1094" y="486" width="140" height="38" rx="6" fill="#fff" stroke="#d9e2e7"/>
+  <text x="1164" y="511" text-anchor="middle" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">儲存字幕</text>
+  <rect x="1248" y="486" width="140" height="38" rx="6" fill="#fff" stroke="#d9e2e7"/>
+  <text x="1318" y="511" text-anchor="middle" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16" font-weight="700">匯出 MP4</text>
+
+  <rect x="368" y="628" width="1044" height="252" rx="8" fill="#fff" stroke="#d9e2e7"/>
+  <text x="392" y="666" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="22" font-weight="700">字幕時間軸</text>
+  <rect x="1078" y="642" width="34" height="30" rx="6" fill="#fff" stroke="#d9e2e7"/>
+  <text x="1095" y="663" text-anchor="middle" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16">-</text>
+  <rect x="1118" y="642" width="44" height="30" rx="6" fill="#fff" stroke="#d9e2e7"/>
+  <text x="1140" y="663" text-anchor="middle" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="14">Fit</text>
+  <rect x="1168" y="642" width="34" height="30" rx="6" fill="#fff" stroke="#d9e2e7"/>
+  <text x="1185" y="663" text-anchor="middle" fill="#1f2933" font-family="Segoe UI, Noto Sans TC, Arial" font-size="16">+</text>
+  <rect x="392" y="690" width="996" height="70" fill="#fbfdfd" stroke="#d9e2e7"/>
+  <path d="M400 725 L408 713 L416 736 L424 706 L432 732 L440 724 L448 739 L456 710 L464 734 L472 725 L480 727 L488 718 L496 741 L504 708 L512 734 L520 723 L528 717 L536 738 L544 712 L552 731 L560 724 L568 742 L576 713 L584 736 L592 724 L600 727 L608 718 L616 741 L624 708 L632 734 L640 723 L648 717 L656 738 L664 712 L672 731 L680 724 L688 742 L696 713 L704 736 L712 724 L720 727 L728 718 L736 741 L744 708 L752 734 L760 723 L768 717 L776 738 L784 712 L792 731 L800 724 L808 742 L816 713 L824 736 L832 724 L840 727 L848 718 L856 741 L864 708 L872 734 L880 723 L888 717 L896 738 L904 712 L912 731 L920 724 L928 742 L936 713 L944 736 L952 724 L960 727 L968 718 L976 741 L984 708 L992 734 L1000 723 L1008 717 L1016 738 L1024 712 L1032 731 L1040 724 L1048 742 L1056 713 L1064 736 L1072 724 L1080 727 L1088 718 L1096 741 L1104 708 L1112 734 L1120 723 L1128 717 L1136 738 L1144 712 L1152 731 L1160 724 L1168 742 L1176 713 L1184 736 L1192 724 L1200 727 L1208 718 L1216 741 L1224 708 L1232 734 L1240 723 L1248 717 L1256 738 L1264 712 L1272 731 L1280 724 L1288 742 L1296 713 L1304 736 L1312 724 L1320 727 L1328 718 L1336 741 L1344 708 L1352 734 L1360 723" fill="none" stroke="#4f8f87" stroke-width="3"/>
+  <rect x="430" y="784" width="250" height="32" rx="6" fill="#1e7f74"/>
+  <text x="454" y="806" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="15">根本沒鎖好，越往上看空隙越大。</text>
+  <rect x="720" y="784" width="210" height="32" rx="6" fill="#1e7f74"/>
+  <text x="744" y="806" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="15">消費者怒控...</text>
+  <rect x="978" y="784" width="300" height="32" rx="6" fill="#1e7f74"/>
+  <text x="1002" y="806" fill="#fff" font-family="Segoe UI, Noto Sans TC, Arial" font-size="15">每一段字幕可拖曳、拉長、縮短</text>
+  <line x1="700" y1="690" x2="700" y2="858" stroke="#b42318" stroke-width="3"/>
+</svg>
