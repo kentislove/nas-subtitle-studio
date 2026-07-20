@@ -14,12 +14,13 @@ PROMPT = """
 
 要求：
 1. transcript：完整繁體中文逐字稿，可修正常見口語贅字，但不要改變意思。
-2. subtitles：句子級字幕，時間以秒為單位，適合 SRT。每段 1 到 2 行，不要太長。
-3. 字幕斷句要符合人機操作教學語氣：一個操作、一個提醒、或一個短句為一段。
-4. 每段字幕建議 3 到 5 秒，最長不要超過 5 秒。
-5. 每段字幕不要超過 36 個中文字；太長請拆成下一段。
-6. chapters：教學章節，依操作流程分段，title 使用繁體中文。
-7. 如果聽不清楚，字幕文字用「（聽不清楚）」。
+2. subtitles：依真實說話聲音切字幕，時間以秒為單位，適合 SRT。
+3. 每段字幕的 start 必須對齊該句開始發聲，end 必須對齊該句結束或下一段開始前。
+4. 說話停頓約 0.35 秒以上、語氣明顯中斷、換操作、換提醒時，必須切成下一段；不要把停頓硬塞進同一段字幕。
+5. 不要平均分配時間，不要為了固定 3 到 5 秒而改寫時間軸；短句可以少於 1 秒，連續長句可以超過 5 秒。
+6. 每段字幕盡量不要超過 36 個中文字；太長時，請以語氣停頓或自然短語拆分，並分別給出對應時間。
+7. chapters：教學章節，依操作流程分段，title 使用繁體中文。
+8. 如果聽不清楚，字幕文字用「（聽不清楚）」。
 
 JSON schema：
 {
@@ -33,6 +34,19 @@ JSON schema：
 - 不要輸出 Markdown。
 - JSON 字串內不要放未跳脫的換行。
 - 所有雙引號都必須正確跳脫。
+"""
+
+
+def _build_prompt(video_duration: float | None = None) -> str:
+    if not video_duration:
+        return PROMPT
+    return f"""
+{PROMPT}
+
+這支影片的實際長度是 {video_duration:.3f} 秒。
+所有 subtitles 與 chapters 的 start/end 必須落在 0 到 {video_duration:.3f} 秒之間。
+最後一段字幕的 end 不得超過 {video_duration:.3f} 秒。
+如果你聽到內容在影片結尾前結束，請用實際結束時間，不要自行延長。
 """
 
 
@@ -91,7 +105,10 @@ def _parse_or_repair_json(client, raw_text: str) -> dict:
             ) from repair_error
 
 
-def generate_subtitles_with_gemini(video_path: Path) -> tuple[str, list[SubtitleSegment], list[Chapter]]:
+def generate_subtitles_with_gemini(
+    video_path: Path,
+    video_duration: float | None = None,
+) -> tuple[str, list[SubtitleSegment], list[Chapter]]:
     api_key = get_gemini_api_key()
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY 未設定，無法產生字幕")
@@ -108,7 +125,7 @@ def generate_subtitles_with_gemini(video_path: Path) -> tuple[str, list[Subtitle
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
-        contents=[uploaded, PROMPT],
+        contents=[uploaded, _build_prompt(video_duration)],
         config={
             "response_mime_type": "application/json",
         },

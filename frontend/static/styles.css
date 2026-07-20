@@ -142,6 +142,24 @@ a {
   display: block;
   background: #111820;
 }
+.viewer-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  background: #16212a;
+}
+.viewer-controls button {
+  color: #e8f2f4;
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.22);
+}
+.viewer-controls button.active {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
 .video-meta {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -157,6 +175,25 @@ a {
 .error-text { color: var(--danger) !important; }
 .action-grid, .download-grid { display: grid; gap: 8px; margin-top: 12px; }
 .action-grid .danger { color: #fff; }
+.import-subtitle-note {
+  border: 1px solid #e4c66a;
+  border-radius: 8px;
+  background: #fff8df;
+  color: #60420a;
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+.import-subtitle-note strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #7a4f00;
+}
+.import-subtitle-note p {
+  margin: 0 0 6px;
+  color: #60420a;
+}
+.import-subtitle-note p:last-child { margin-bottom: 0; }
 .download-grid { grid-template-columns: 1fr 1fr; }
 .editor-layout {
   display: grid;
@@ -169,6 +206,138 @@ a {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 14px;
+}
+.timeline-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.timeline-clock {
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+.timeline-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.timeline-tools button {
+  width: 34px;
+  height: 30px;
+  padding: 0;
+  line-height: 1;
+}
+.timeline-tools #timelineFitBtn { width: 44px; }
+.timeline-viewport {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f7fbfc;
+  margin: 8px 0 14px;
+  min-height: 172px;
+  max-height: 420px;
+  cursor: grab;
+}
+.timeline-viewport:active { cursor: grabbing; }
+.timeline-canvas {
+  position: relative;
+  min-width: 100%;
+  padding-top: 28px;
+}
+.timeline-ruler {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 28px;
+  border-bottom: 1px solid var(--line);
+  background: #eef3f5;
+}
+.timeline-tick {
+  position: absolute;
+  top: 0;
+  height: 28px;
+  border-left: 1px solid #c9d6dc;
+  color: var(--text-soft);
+  font-size: 0.72rem;
+  line-height: 28px;
+  padding-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.timeline-waveform {
+  display: block;
+  height: 74px;
+  border-bottom: 1px solid #d9e2e7;
+  background: #fbfdfd;
+}
+.timeline-tracks { position: relative; }
+.timeline-track {
+  position: relative;
+  height: 42px;
+  border-bottom: 1px solid #e4ecef;
+}
+.timeline-label {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  display: inline-flex;
+  width: 38px;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-soft);
+  background: rgba(247, 251, 252, 0.94);
+  border-right: 1px solid var(--line);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+.timeline-clip {
+  position: absolute;
+  top: 7px;
+  height: 28px;
+  min-width: 18px;
+  border: 1px solid #17685f;
+  border-radius: 6px;
+  background: #1e7f74;
+  color: #fff;
+  cursor: grab;
+  overflow: hidden;
+  user-select: none;
+}
+.timeline-clip.active {
+  border-color: #0f4f49;
+  box-shadow: 0 0 0 2px rgba(30, 127, 116, 0.2);
+}
+.timeline-clip:active { cursor: grabbing; }
+.timeline-clip-label {
+  display: block;
+  padding: 5px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+}
+.timeline-handle {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 100%;
+  background: rgba(255,255,255,0.42);
+  cursor: ew-resize;
+}
+.timeline-handle.start { left: 0; border-radius: 5px 0 0 5px; }
+.timeline-handle.end { right: 0; border-radius: 0 5px 5px 0; }
+.timeline-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--danger);
+  pointer-events: none;
+  z-index: 4;
 }
 .subtitle-list { display: grid; gap: 10px; }
 .subtitle-row {

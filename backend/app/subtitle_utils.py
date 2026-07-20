@@ -11,6 +11,10 @@ MAX_SUBTITLE_SECONDS = 5.0
 MAX_LINE_CHARS = 18
 MAX_LINES = 2
 MAX_SEGMENT_CHARS = MAX_LINE_CHARS * MAX_LINES
+TIMECODE_RE = re.compile(
+    r"(?P<start>\d{1,2}:\d{2}(?::\d{2})?[\.,]\d{1,3})\s*-->\s*"
+    r"(?P<end>\d{1,2}:\d{2}(?::\d{2})?[\.,]\d{1,3})"
+)
 
 
 def seconds_to_srt_time(value: float) -> str:
@@ -25,6 +29,85 @@ def seconds_to_srt_time(value: float) -> str:
 
 def seconds_to_vtt_time(value: float) -> str:
     return seconds_to_srt_time(value).replace(",", ".")
+
+
+def subtitle_time_to_seconds(value: str) -> float:
+    text = value.strip().replace(",", ".")
+    parts = text.split(":")
+    if len(parts) == 2:
+        hours = 0
+        minutes, seconds = parts
+    elif len(parts) == 3:
+        hours, minutes, seconds = parts
+    else:
+        raise ValueError(f"不支援的字幕時間格式：{value}")
+    return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+
+
+def clean_imported_subtitle_text(lines: list[str]) -> str:
+    text = "\n".join(line.strip() for line in lines).strip()
+    text = re.sub(r"</?[^>]+>", "", text)
+    return html.unescape(text).strip()
+
+
+def decode_subtitle_bytes(data: bytes) -> str:
+    for encoding in ("utf-8-sig", "utf-16", "cp950", "big5"):
+        try:
+            return data.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return data.decode("utf-8", errors="replace")
+
+
+def parse_subtitle_text(content: str) -> list[SubtitleSegment]:
+    text = content.replace("\r\n", "\n").replace("\r", "\n").lstrip("\ufeff")
+    lines = text.split("\n")
+    segments: list[SubtitleSegment] = []
+    index = 0
+    while index < len(lines):
+        line = lines[index].strip()
+        match = TIMECODE_RE.search(line)
+        if not match:
+            index += 1
+            continue
+        index += 1
+        cue_lines: list[str] = []
+        while index < len(lines) and lines[index].strip():
+            cue_lines.append(lines[index])
+            index += 1
+        cue_text = clean_imported_subtitle_text(cue_lines)
+        if cue_text:
+            start = subtitle_time_to_seconds(match.group("start"))
+            end = subtitle_time_to_seconds(match.group("end"))
+            if end > start:
+                segments.append(SubtitleSegment(
+                    id=str(uuid4()),
+                    start=start,
+                    end=end,
+                    text=cue_text,
+                ))
+        index += 1
+    return sanitize_subtitle_segments(segments)
+
+
+def clamp_imported_segments(
+    segments: list[SubtitleSegment],
+    max_duration: float | None,
+) -> list[SubtitleSegment]:
+    if not max_duration or max_duration <= 0:
+        return sanitize_subtitle_segments(segments)
+    limit = float(max_duration)
+    clipped: list[SubtitleSegment] = []
+    for seg in segments:
+        if seg.end <= 0 or seg.start >= limit:
+            continue
+        clipped.append(SubtitleSegment(
+            id=seg.id,
+            start=max(0.0, seg.start),
+            end=min(limit, seg.end),
+            text=seg.text,
+        ))
+    return sanitize_subtitle_segments(clipped)
 
 
 def segments_to_srt(segments: list[SubtitleSegment]) -> str:
@@ -76,9 +159,7 @@ def layout_subtitle_text(text: str) -> str:
         return cleaned
     lines = []
     remaining = cleaned
-    for _ in range(MAX_LINES):
-        if not remaining:
-            break
+    while remaining:
         if len(remaining) <= MAX_LINE_CHARS:
             lines.append(remaining)
             remaining = ""
@@ -91,8 +172,6 @@ def layout_subtitle_text(text: str) -> str:
                 break
         lines.append(remaining[:cut])
         remaining = remaining[cut:]
-    if remaining and lines:
-        lines[-1] = lines[-1].rstrip("，、；,;") + "…"
     return "\n".join(lines)
 
 
@@ -120,6 +199,55 @@ def normalize_subtitle_segments(segments: list[SubtitleSegment]) -> list[Subtitl
     return normalized
 
 
+def sanitize_subtitle_segments(segments: list[SubtitleSegment], max_duration: float | None = None) -> list[SubtitleSegment]:
+    sanitized: list[SubtitleSegment] = []
+    for seg in sorted(segments, key=lambda item: (item.start, item.end)):
+        text = (seg.text or "").strip()
+        if not text:
+            continue
+        start = max(0.0, float(seg.start))
+        end = max(start + 0.15, float(seg.end))
+        if max_duration is not None:
+            limit = max(0.15, float(max_duration))
+            start = min(start, max(0.0, limit - 0.15))
+            end = min(max(start + 0.15, end), limit)
+        sanitized.append(SubtitleSegment(
+            id=seg.id or str(uuid4()),
+            start=start,
+            end=end,
+            text=text,
+        ))
+    return sanitized
+
+
+def fit_subtitle_segments_to_duration(
+    segments: list[SubtitleSegment],
+    duration: float | None,
+) -> list[SubtitleSegment]:
+    sanitized = sanitize_subtitle_segments(segments)
+    if not sanitized or not duration or duration <= 0:
+        return sanitized
+    limit = float(duration)
+    last_end = max(seg.end for seg in sanitized)
+    if last_end <= limit + 0.5:
+        return sanitize_subtitle_segments(sanitized, max_duration=limit)
+    first_start = min(seg.start for seg in sanitized)
+    if last_end <= first_start:
+        return sanitize_subtitle_segments(sanitized, max_duration=limit)
+    scale = max(0.01, (limit - first_start) / (last_end - first_start))
+    fitted: list[SubtitleSegment] = []
+    for seg in sanitized:
+        start = first_start + (seg.start - first_start) * scale
+        end = first_start + (seg.end - first_start) * scale
+        fitted.append(SubtitleSegment(
+            id=seg.id,
+            start=start,
+            end=max(start + 0.15, end),
+            text=seg.text,
+        ))
+    return sanitize_subtitle_segments(fitted, max_duration=limit)
+
+
 def chapters_to_markdown(chapters: list[Chapter]) -> str:
     lines = ["# 影片章節", ""]
     for chapter in chapters:
@@ -130,13 +258,14 @@ def chapters_to_markdown(chapters: list[Chapter]) -> str:
 
 
 def write_subtitle_files(base: Path, segments: list[SubtitleSegment],
-                         chapters: list[Chapter], transcript: str) -> dict[str, Path]:
+                         chapters: list[Chapter], transcript: str,
+                         normalize: bool = True) -> dict[str, Path]:
     base.parent.mkdir(parents=True, exist_ok=True)
     srt = base.with_suffix(".srt")
     vtt = base.with_suffix(".vtt")
     txt = base.with_suffix(".txt")
     md = base.with_suffix(".chapters.md")
-    normalized = normalize_subtitle_segments(segments)
+    normalized = normalize_subtitle_segments(segments) if normalize else sanitize_subtitle_segments(segments)
     srt.write_text(segments_to_srt(normalized), encoding="utf-8")
     vtt.write_text(segments_to_vtt(normalized), encoding="utf-8")
     txt.write_text(transcript or "", encoding="utf-8")

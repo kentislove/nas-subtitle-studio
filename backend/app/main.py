@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import BackgroundTasks, FastAPI, File, HTTPException, Request, UploadFile
+from fastapi import BackgroundTasks, FastAPI, File, HTTPException, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
@@ -14,8 +15,15 @@ from app.gemini_service import generate_subtitles_with_gemini
 from app.models import GeminiSettingsUpdate, SubtitleUpdate, VideoRecord
 from app.runtime_settings import is_gemini_configured, save_gemini_api_key
 from app.storage import create_video, delete_video, get_video, init_db, list_videos, update_video, utc_now
-from app.subtitle_utils import normalize_subtitle_segments, write_subtitle_files
-from app.video_tools import burn_subtitles, probe_duration, transcode_to_mp4
+from app.subtitle_utils import (
+    clamp_imported_segments,
+    decode_subtitle_bytes,
+    fit_subtitle_segments_to_duration,
+    parse_subtitle_text,
+    sanitize_subtitle_segments,
+    write_subtitle_files,
+)
+from app.video_tools import analyze_audio_waveform, burn_subtitles, probe_duration, transcode_to_mp4
 
 app = FastAPI(title="NAS Subtitle Studio API", version="0.1.0")
 
@@ -64,6 +72,10 @@ def export_path(record: VideoRecord) -> Path:
     return EXPORTS_DIR / f"{record.id}_captioned.mp4"
 
 
+def waveform_cache_path(record: VideoRecord, points: int) -> Path:
+    return SUBTITLES_DIR / record.id / f"waveform-{Path(record.stored_filename).stem}-{points}.json"
+
+
 def normalize_video_task(video_id: str) -> None:
     record = get_video(video_id)
     if not record:
@@ -72,10 +84,37 @@ def normalize_video_task(video_id: str) -> None:
     try:
         suffix = src.suffix.lower()
         update_video(video_id, status="preparing", error=None)
-        if suffix in {".webm", ".mp4"}:
+        if suffix == ".mp4":
             duration = probe_duration(src)
+            if duration is None:
+                dst = normalized_mp4_path(record)
+                if dst == src:
+                    dst = VIDEOS_DIR / f"{record.id}.normalized.mp4"
+                update_video(video_id, status="transcoding", error=None)
+                transcode_to_mp4(src, dst)
+                duration = probe_duration(dst)
+                if duration is None:
+                    raise RuntimeError("MP4 轉檔後仍無法取得影片長度")
+                src = dst
             update_video(
                 video_id,
+                stored_filename=src.name,
+                status="ready",
+                duration=duration,
+                error=None,
+            )
+            return
+
+        if suffix == ".webm":
+            update_video(video_id, status="transcoding", error=None)
+            dst = normalized_mp4_path(record)
+            transcode_to_mp4(src, dst)
+            duration = probe_duration(dst)
+            if duration is None:
+                raise RuntimeError("WebM 轉成 MP4 後仍無法取得影片長度")
+            update_video(
+                video_id,
+                stored_filename=dst.name,
                 status="ready",
                 duration=duration,
                 error=None,
@@ -86,6 +125,8 @@ def normalize_video_task(video_id: str) -> None:
         dst = normalized_mp4_path(record)
         transcode_to_mp4(src, dst)
         duration = probe_duration(dst)
+        if duration is None:
+            raise RuntimeError("影片轉成 MP4 後仍無法取得影片長度")
         update_video(
             video_id,
             stored_filename=dst.name,
@@ -103,9 +144,9 @@ def generate_subtitle_task(video_id: str) -> None:
         return
     try:
         update_video(video_id, status="captioning", error=None)
-        transcript, segments, chapters = generate_subtitles_with_gemini(video_path(record))
-        segments = normalize_subtitle_segments(segments)
-        write_subtitle_files(subtitle_base(record), segments, chapters, transcript)
+        transcript, segments, chapters = generate_subtitles_with_gemini(video_path(record), record.duration)
+        segments = fit_subtitle_segments_to_duration(segments, record.duration)
+        write_subtitle_files(subtitle_base(record), segments, chapters, transcript, normalize=False)
         update_video(
             video_id,
             status="editable",
@@ -129,7 +170,13 @@ def export_captioned_task(video_id: str) -> None:
         for file in (final, tmp):
             if file.exists():
                 file.unlink()
-        files = write_subtitle_files(subtitle_base(record), record.subtitles, record.chapters, record.transcript)
+        files = write_subtitle_files(
+            subtitle_base(record),
+            record.subtitles,
+            record.chapters,
+            record.transcript,
+            normalize=False,
+        )
         burn_subtitles(video_path(record), files["srt"], final)
         update_video(video_id, status="exported", error=None)
     except Exception as exc:
@@ -233,6 +280,38 @@ def video_detail(video_id: str) -> VideoRecord:
     return record
 
 
+@app.get("/api/videos/{video_id}/waveform")
+def video_waveform(video_id: str, points: int = Query(default=1600, ge=200, le=5000)) -> dict:
+    record = get_video(video_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="找不到影片")
+    src = video_path(record)
+    if not src.exists():
+        raise HTTPException(status_code=404, detail="找不到影片檔")
+    cache = waveform_cache_path(record, points)
+    source_mtime = src.stat().st_mtime
+    if cache.exists():
+        try:
+            cached = json.loads(cache.read_text(encoding="utf-8"))
+            if cached.get("source_mtime") == source_mtime:
+                return cached
+        except Exception:
+            pass
+    try:
+        waveform = analyze_audio_waveform(src, points)
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"無法讀取音訊波形：{exc}") from exc
+    payload = {
+        "video_id": record.id,
+        "stored_filename": record.stored_filename,
+        "source_mtime": source_mtime,
+        **waveform,
+    }
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    return payload
+
+
 @app.delete("/api/videos/{video_id}")
 def remove_video(video_id: str) -> dict:
     record = get_video(video_id)
@@ -264,13 +343,50 @@ def update_subtitles(video_id: str, payload: SubtitleUpdate) -> VideoRecord:
     record = get_video(video_id)
     if not record:
         raise HTTPException(status_code=404, detail="找不到影片")
-    segments = normalize_subtitle_segments(payload.subtitles)
-    write_subtitle_files(subtitle_base(record), segments, payload.chapters, payload.transcript)
+    segments = sanitize_subtitle_segments(payload.subtitles, max_duration=record.duration)
+    write_subtitle_files(subtitle_base(record), segments, payload.chapters, payload.transcript, normalize=False)
     return update_video(
         video_id,
         subtitles=segments,
         chapters=payload.chapters,
         transcript=payload.transcript,
+        status="editable",
+        error=None,
+    )
+
+
+@app.post("/api/videos/{video_id}/subtitles/import")
+async def import_subtitles(video_id: str, file: UploadFile = File(...)) -> VideoRecord:
+    record = get_video(video_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="找不到影片")
+    original = file.filename or "subtitles.srt"
+    suffix = Path(original).suffix.lower()
+    if suffix not in {".srt", ".vtt"}:
+        raise HTTPException(status_code=400, detail="僅支援匯入 SRT 或 VTT 字幕檔")
+    try:
+        data = await file.read(5 * 1024 * 1024 + 1)
+    finally:
+        await file.close()
+    if not data:
+        raise HTTPException(status_code=400, detail="字幕檔是空的")
+    if len(data) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="字幕檔超過 5 MB")
+
+    try:
+        imported = parse_subtitle_text(decode_subtitle_bytes(data))
+        segments = clamp_imported_segments(imported, record.duration)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"字幕檔解析失敗：{exc}") from exc
+    if not segments:
+        raise HTTPException(status_code=400, detail="字幕檔沒有可匯入的時間軸字幕")
+
+    transcript = "\n".join(seg.text for seg in segments)
+    write_subtitle_files(subtitle_base(record), segments, record.chapters, transcript, normalize=False)
+    return update_video(
+        video_id,
+        subtitles=segments,
+        transcript=transcript,
         status="editable",
         error=None,
     )

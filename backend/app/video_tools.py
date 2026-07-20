@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 import json
+import math
 import subprocess
+from array import array
 from pathlib import Path
 
 
 def run_command(args: list[str]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(args, capture_output=True, text=True, check=True)
+
+
+def run_binary_command(args: list[str]) -> bytes:
+    result = subprocess.run(args, capture_output=True, check=True)
+    return result.stdout
 
 
 def _escape_subtitle_filter_path(path: Path) -> str:
@@ -53,6 +60,42 @@ def transcode_to_mp4(src: Path, dst: Path) -> None:
         "+faststart",
         str(dst),
     ])
+
+
+def analyze_audio_waveform(src: Path, points: int = 1600) -> dict:
+    points = max(200, min(5000, int(points or 1600)))
+    sample_rate = 8000
+    raw = run_binary_command([
+        "ffmpeg",
+        "-v",
+        "error",
+        "-i",
+        str(src),
+        "-map",
+        "0:a:0",
+        "-ac",
+        "1",
+        "-ar",
+        str(sample_rate),
+        "-f",
+        "s16le",
+        "-",
+    ])
+    samples = array("h")
+    samples.frombytes(raw)
+    if not samples:
+        return {"duration": 0.0, "sample_rate": sample_rate, "peaks": []}
+    chunk_size = max(1, math.ceil(len(samples) / points))
+    peaks = []
+    for start in range(0, len(samples), chunk_size):
+        chunk = samples[start:start + chunk_size]
+        peak = max(abs(value) for value in chunk) / 32768
+        peaks.append(round(min(1.0, peak), 4))
+    return {
+        "duration": round(len(samples) / sample_rate, 3),
+        "sample_rate": sample_rate,
+        "peaks": peaks,
+    }
 
 
 def extract_audio(src: Path, dst: Path) -> None:

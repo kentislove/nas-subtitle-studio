@@ -54,6 +54,9 @@
         <section id="viewerBand" class="viewer-band hidden">
           <div class="viewer-main">
             <video id="player" controls></video>
+            <div class="viewer-controls">
+              <button id="previewSubtitleBtn" type="button">顯示預覽字幕</button>
+            </div>
           </div>
           <div class="video-meta">
             <h2 id="videoTitle"></h2>
@@ -64,6 +67,13 @@
             <p id="videoError" class="error-text"></p>
             <div class="action-grid">
               <button id="captionBtn">產生字幕</button>
+              <button id="importSubtitleBtn">匯入字幕</button>
+              <input id="subtitleFileInput" class="hidden" type="file" accept=".srt,.vtt,text/vtt,application/x-subrip" />
+              <div class="import-subtitle-note">
+                <strong>⚠️ 注意：</strong>
+                <p>匯入字幕的時候，建議先將原始影片上傳到 Gemini 對話視窗，透過 Gemini 產生字幕 SRT 檔再下載回來。</p>
+                <p>產生 SRT 檔案後，按下這個按鈕匯入字幕，以便整合。</p>
+              </div>
               <button id="saveBtn">儲存字幕</button>
               <button id="exportBtn">匯出含字幕 MP4</button>
               <button id="deleteVideoBtn" class="danger">刪除影片</button>
@@ -85,6 +95,23 @@
               <h2>字幕編輯</h2>
               <button id="addSubtitleBtn">新增字幕</button>
             </div>
+            <div class="timeline-head">
+              <h2>字幕時間軸</h2>
+              <div class="timeline-tools">
+                <button id="timelineZoomOutBtn" type="button" title="縮小時間軸">-</button>
+                <button id="timelineFitBtn" type="button" title="符合視窗">Fit</button>
+                <button id="timelineZoomInBtn" type="button" title="放大時間軸">+</button>
+                <span id="timelineClock" class="timeline-clock">00:00.000</span>
+              </div>
+            </div>
+            <div id="timelineViewport" class="timeline-viewport">
+              <div id="timelineCanvas" class="timeline-canvas">
+                <div id="timelineRuler" class="timeline-ruler"></div>
+                <canvas id="timelineWaveform" class="timeline-waveform"></canvas>
+                <div id="timelineTracks" class="timeline-tracks"></div>
+                <div id="timelinePlayhead" class="timeline-playhead"></div>
+              </div>
+            </div>
             <div id="subtitleList" class="subtitle-list"></div>
           </div>
 
@@ -101,6 +128,6 @@
         </section>
       </main>
     </div>
-    <script src="/app.js"></script>
+    <script src="/app.js?v=20260720-import-note"></script>
   </body>
 </html>
